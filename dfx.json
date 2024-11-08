@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "one-id-backend": {
+      "main": "src/one-id-backend/main.mo",
+      "type": "motoko"
+    },
+    "one-id-frontend": {
+      "dependencies": [
+        "one-id-backend"
+      ],
+      "source": [
+        "src/one-id-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "one-id-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
