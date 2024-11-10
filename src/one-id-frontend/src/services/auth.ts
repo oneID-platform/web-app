@@ -16,7 +16,11 @@ export class AuthService {
 
   public async init(): Promise<AuthClient> {
     if (!this.authClient) {
-      this.authClient = await AuthClient.create();
+      this.authClient = await AuthClient.create({
+        idleOptions: {
+          disableIdle: true,
+        },
+      });
     }
     return this.authClient;
   }
@@ -30,7 +34,7 @@ export class AuthService {
       identityProvider:
         process.env.DFX_NETWORK === "ic"
           ? "https://identity.ic0.app/#authorize"
-          : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
+          : `http://localhost:4943?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai#authorize`,
       maxTimeToLive: days * hours * nanoseconds,
       onSuccess: () => {
         window.location.href = "/dashboard";
