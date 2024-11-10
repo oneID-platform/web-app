@@ -65,6 +65,10 @@
 		animation-direction: var(--direction);
 		animation-duration: var(--duration);
 	}
+
+	.inner:hover {
+		animation-play-state: paused;
+	}
 }
 
 .tag {
@@ -80,6 +84,7 @@
 	border: 1px solid rgb(54, 54, 54);
 	padding: 0.5rem 0.8rem;
 	margin-right: 1rem;
+	cursor: pointer;
 	box-shadow: 0 0.1rem 0.2rem rgb(23, 23, 23 / 20%),
 		0 0.1rem 0.5rem rgb(23, 23, 23 / 30%),
 		0 0.2rem 1.5rem rgb(23, 23, 23 / 40%);
