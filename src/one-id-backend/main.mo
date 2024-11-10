@@ -9,11 +9,14 @@ import Nat "mo:base/Nat";
 import Int "mo:base/Int";
 
 actor OneIDPlatform {
-    // Types remain the same
-    public type DocumentType = {
+    // Types
+    public type CredentialType = {
         #NIN;
         #BVN;
-        #Passport;
+        #InternationalPassport;
+        #NationalPassport;
+        #DriversLicense;
+        #FaceID;
         #VotersCard;
     };
 
@@ -23,10 +26,13 @@ actor OneIDPlatform {
         #Rejected;
     };
 
-    public type Document = {
-        documentType: DocumentType;
-        documentNumber: Text;
-        imageHash: ?Text;
+    public type Credential = {
+        title: Text;
+        imageUrl: Text;
+        description: Text;
+        credentialType: CredentialType;
+        provided: Bool;
+        info: [(Text, Text)];  // Using an array of tuples to represent key-value pairs
         verificationStatus: VerificationStatus;
         submissionTime: Time.Time;
         verificationTime: ?Time.Time;
@@ -34,36 +40,36 @@ actor OneIDPlatform {
     };
 
     public type UserProfile = {
-        documents: [Document];
+        credentials: [Credential];
         authorizedApps: [AppAuthorization];
         lastUpdated: Time.Time;
     };
 
     public type AppAuthorization = {
-        appId: Principal;
+        appId: Text;
         name: Text;
-        scopes: [DocumentType];
+        scopes: [CredentialType];
         authorized: Bool;
         authorizationTime: Time.Time;
     };
 
     public type ThirdPartyApp = {
+        appId:Text;
         name: Text;
         description: Text;
         redirectUri: Text;
         clientSecret: Text;
-        allowedScopes: [DocumentType];
+        allowedScopes: [CredentialType];
         registrationTime: Time.Time;
     };
 
-    // State variables remain the same
+    // State variables
     private stable var userEntries : [(Principal, UserProfile)] = [];
-    private stable var appEntries : [(Principal, ThirdPartyApp)] = [];
-    
+    private stable var appEntries : [(Text, ThirdPartyApp)] = [];
     private var users = HashMap.HashMap<Principal, UserProfile>(0, Principal.equal, Principal.hash);
-    private var registeredApps = HashMap.HashMap<Principal, ThirdPartyApp>(0, Principal.equal, Principal.hash);
+    private var registeredApps = HashMap.HashMap<Text, ThirdPartyApp>(0, Text.equal, Text.hash);
 
-    // System upgrade functions remain the same
+    // System upgrade functions
     system func preupgrade() {
         userEntries := Iter.toArray(users.entries());
         appEntries := Iter.toArray(registeredApps.entries());
@@ -71,7 +77,7 @@ actor OneIDPlatform {
 
     system func postupgrade() {
         users := HashMap.fromIter<Principal, UserProfile>(userEntries.vals(), 0, Principal.equal, Principal.hash);
-        registeredApps := HashMap.fromIter<Principal, ThirdPartyApp>(appEntries.vals(), 0, Principal.equal, Principal.hash);
+        registeredApps := HashMap.fromIter<Text, ThirdPartyApp>(appEntries.vals(), 0, Text.equal, Text.hash);
     };
 
     // User Management
@@ -88,7 +94,7 @@ actor OneIDPlatform {
             };
             case null {
                 let newProfile : UserProfile = {
-                    documents = [];
+                    credentials = [];
                     authorizedApps = [];
                     lastUpdated = Time.now();
                 };
@@ -98,101 +104,113 @@ actor OneIDPlatform {
         };
     };
 
-    // Document Management
-    public shared(msg) func submitDocument(
-        docType: DocumentType,
-        documentNumber: Text,
-        imageHash: ?Text
-    ) : async Result.Result<Document, Text> {
+    // Credential Management
+    public shared(msg) func submitCredential(
+        title: Text,
+        imageUrl: Text,
+        description: Text,
+        credentialType: CredentialType,
+        info: [(Text, Text)]
+    ) : async Result.Result<Credential, Text> {
         let caller = msg.caller;
         
         switch (users.get(caller)) {
             case null return #err("User not initialized");
             case (?userProfile) {
-                let newDocument : Document = {
-                    documentType = docType;
-                    documentNumber = documentNumber;
-                    imageHash = imageHash;
+                let newCredential : Credential = {
+                    title = title;
+                    imageUrl = imageUrl;
+                    description = description;
+                    credentialType = credentialType;
+                    provided = true;
+                    info = info;
                     verificationStatus = #Pending;
                     submissionTime = Time.now();
                     verificationTime = null;
                     aiVerificationResult = null;
                 };
 
-                let updatedDocs = Array.append<Document>(
-                    userProfile.documents,
-                    [newDocument]
+                let updatedCreds = Array.append<Credential>(
+                    userProfile.credentials,
+                    [newCredential]
                 );
 
                 let updatedProfile : UserProfile = {
-                    documents = updatedDocs;
+                    credentials = updatedCreds;
                     authorizedApps = userProfile.authorizedApps;
                     lastUpdated = Time.now();
                 };
 
                 users.put(caller, updatedProfile);
-                #ok(newDocument);
+                #ok(newCredential);
             };
         };
     };
 
-    public shared(msg) func updateDocumentVerification(
-        docType: DocumentType,
+    public shared(msg) func updateCredentialVerification(
+        credentialType: CredentialType,
+        title: Text,
         aiResult: Text
-    ) : async Result.Result<Document, Text> {
+    ) : async Result.Result<Credential, Text> {
         let caller = msg.caller;
-        
-        switch (users.get(caller)) {
-            case null return #err("User not found");
-            case (?userProfile) {
-                // Create a document to search for
-                let searchDoc : Document = {
-                    documentType = docType;
-                    documentNumber = "";  // These fields don't matter for comparison
-                    imageHash = null;
-                    verificationStatus = #Pending;
-                    submissionTime = 0;
-                    verificationTime = null;
-                    aiVerificationResult = null;
-                };
+    
+    switch (users.get(caller)) {
+        case null return #err("User not found");
+        case (?userProfile) {
+            // Create a credential to search for
+            let searchCred : Credential = {
+                title = title;
+                imageUrl = "";
+                description = "";
+                credentialType = credentialType;
+                provided = true;
+                info = [];
+                verificationStatus = #Pending;
+                submissionTime = 0;
+                verificationTime = null;
+                aiVerificationResult = null;
+            };
 
-                let documentIndex = Array.indexOf<Document>(
-                    searchDoc,
-                    userProfile.documents,
-                    func(a: Document, b: Document) : Bool {
-                        a.documentType == b.documentType
-                    }
-                );
+            let credentialIndex = Array.indexOf<Credential>(
+                searchCred,                    // element to find
+                userProfile.credentials,       // array to search in
+                func(a: Credential, b: Credential) : Bool {
+                    a.credentialType == b.credentialType and a.title == b.title
+                }
+            );
 
-                switch (documentIndex) {
-                    case null #err("Document not found");
+                switch (credentialIndex) {
+                    case null #err("Credential not found");
                     case (?index) {
-                        let updatedDoc : Document = {
-                            documentType = docType;
-                            documentNumber = userProfile.documents[index].documentNumber;
-                            imageHash = userProfile.documents[index].imageHash;
+                        let updatedCred : Credential = {
+                            title = userProfile.credentials[index].title;
+                            imageUrl = userProfile.credentials[index].imageUrl;
+                            description = userProfile.credentials[index].description;
+                            credentialType = userProfile.credentials[index].credentialType;
+                            provided = userProfile.credentials[index].provided;
+                            info = userProfile.credentials[index].info;
                             verificationStatus = #Verified;
-                            submissionTime = userProfile.documents[index].submissionTime;
+                            submissionTime = userProfile.credentials[index].submissionTime;
                             verificationTime = ?Time.now();
                             aiVerificationResult = ?aiResult;
                         };
 
-                        let updatedDocs = Array.tabulate<Document>(
-                            userProfile.documents.size(),
-                            func(i: Nat) : Document {
-                                if (i == index) { updatedDoc } 
-                                else { userProfile.documents[i] }
+                        let updatedCreds = Array.tabulate<Credential>(
+                            userProfile.credentials.size(),
+                            func(i: Nat) : Credential {
+                                if (i == index) { updatedCred } 
+                                else { userProfile.credentials[i] }
                             }
                         );
 
                         let updatedProfile : UserProfile = {
-                            documents = updatedDocs;
+                            credentials = updatedCreds;
                             authorizedApps = userProfile.authorizedApps;
                             lastUpdated = Time.now();
                         };
 
                         users.put(caller, updatedProfile);
-                        #ok(updatedDoc);
+                        #ok(updatedCred);
                     };
                 };
             };
@@ -201,18 +219,19 @@ actor OneIDPlatform {
 
     // App Registration and Authorization
     public shared(msg) func registerApp(
+      appId: Text,
         name: Text,
         description: Text,
         redirectUri: Text,
-        allowedScopes: [DocumentType]
+        allowedScopes: [CredentialType]
     ) : async Result.Result<ThirdPartyApp, Text> {
-        let appId = msg.caller;
         
         switch (registeredApps.get(appId)) {
             case (?_) #err("App already registered");
             case null {
-                let clientSecret = generateSecret(appId, Time.now());
+                let clientSecret = generateSecretText(appId, Time.now());
                 let app : ThirdPartyApp = {
+                  appId = appId;
                     name = name;
                     description = description;
                     redirectUri = redirectUri;
@@ -227,8 +246,8 @@ actor OneIDPlatform {
     };
 
     public shared(msg) func authorizeApp(
-        appId: Principal,
-        scopes: [DocumentType]
+        appId: Text,
+        scopes: [CredentialType]
     ) : async Result.Result<AppAuthorization, Text> {
         let caller = msg.caller;
         
@@ -252,7 +271,7 @@ actor OneIDPlatform {
                         );
 
                         let updatedProfile : UserProfile = {
-                            documents = userProfile.documents;
+                            credentials = userProfile.credentials;
                             authorizedApps = updatedAuths;
                             lastUpdated = Time.now();
                         };
@@ -273,17 +292,17 @@ actor OneIDPlatform {
         };
     };
 
-    public query func getAppDetails(appId: Principal) : async Result.Result<ThirdPartyApp, Text> {
+    public query func getAppDetails(appId: Text) : async Result.Result<ThirdPartyApp, Text> {
         switch (registeredApps.get(appId)) {
             case null #err("App not found");
             case (?app) #ok(app);
         };
     };
 
-    public query func getAuthorizedDocuments(
+    public query func getAuthorizedCredentials(
         user: Principal,
-        appId: Principal
-    ) : async Result.Result<[Document], Text> {
+        appId: Text
+    ) : async Result.Result<[Credential], Text> {
         switch (users.get(user)) {
             case null #err("User not found");
             case (?profile) {
@@ -307,17 +326,17 @@ actor OneIDPlatform {
                     case null #err("App not authorized");
                     case (?index) {
                         let auth = profile.authorizedApps[index];
-                        let authorizedDocs = Array.filter<Document>(
-                            profile.documents,
-                            func(doc: Document) : Bool {
-                                Array.indexOf<DocumentType>(
-                                    doc.documentType,
+                        let authorizedCreds = Array.filter<Credential>(
+                            profile.credentials,
+                            func(cred: Credential) : Bool {
+                                Array.indexOf<CredentialType>(
+                                    cred.credentialType,
                                     auth.scopes,
-                                    func(a: DocumentType, b: DocumentType) : Bool { a == b }
+                                    func(a: CredentialType, b: CredentialType) : Bool { a == b }
                                 ) != null
                             }
                         );
-                        #ok(authorizedDocs);
+                        #ok(authorizedCreds);
                     };
                 };
             };
@@ -325,10 +344,13 @@ actor OneIDPlatform {
     };
 
     // Helper Functions
-private func generateSecret(principal: Principal, timestamp: Time.Time) : Text {
-    // Simply combine principal and timestamp as text
-    let principalText = Principal.toText(principal);
-    let timeText = Int.toText(timestamp);
-    principalText # "-" # timeText;
-};
+    private func generateSecret(principal: Principal , timestamp: Time.Time) : Text {
+        let principalText = Principal.toText(principal);
+        let timeText = Int.toText(timestamp);
+        principalText # "-" # timeText;
+    };
+    private func generateSecretText(principal:Text , timestamp: Time.Time) : Text {
+        let timeText = Int.toText(timestamp);
+        principal # "-" # timeText;
+    };
 }
