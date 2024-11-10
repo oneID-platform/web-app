@@ -14,5 +14,11 @@
   "type": "module",
   "workspaces": [
     "src/one-id-frontend"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/agent": "^1.4.0",
+    "@dfinity/auth-client": "^1.4.0",
+    "@dfinity/candid": "^1.4.0",
+    "@dfinity/principal": "^1.4.0"
+  }
 }

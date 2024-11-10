@@ -3,6 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import "./app.css";
 import DashboardLayout from "./components/dashboard/dashboard-layout";
 import UserProfile from "./pages/user-profile";
+import { ProtectedRoute } from "./components/protected-route";
 import Integrations from "./pages/integrations";
 
 const router = createBrowserRouter([
@@ -11,7 +12,11 @@ const router = createBrowserRouter([
 		element: <LandingPage />,
 	},
 	{
-		element: <DashboardLayout />,
+		element: (
+			// <ProtectedRoute>
+			<DashboardLayout />
+			// </ProtectedRoute>
+		),
 		children: [
 			{
 				path: "/dashboard",
@@ -24,6 +29,7 @@ const router = createBrowserRouter([
 		],
 	},
 ]);
+
 function App() {
 	return <RouterProvider router={router} />;
 }
