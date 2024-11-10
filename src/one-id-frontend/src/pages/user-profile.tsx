@@ -13,7 +13,7 @@ function UserProfile() {
 						className='w-16 h-16 rounded-full'
 					/>
 					<div>
-						<h1 className='font-bold text-[1.3rem] font-grotesk'>
+						<h1 className='font-bold text-[1.3rem] font-grotesk text-gray-300'>
 							0x61fd...1788
 						</h1>
 						<p className='text-gray-500 text-sm'>

@@ -99,10 +99,10 @@
 	pointer-events: none;
 	background: linear-gradient(
 		90deg,
-		#0000001a,
+		transparent,
 		transparent 30%,
 		transparent 70%,
-		#0000001a
+		transparent
 	);
 	position: absolute;
 	inset: 0;
@@ -151,4 +151,64 @@
 .flicker-1 {
 	-webkit-animation: flicker-1 2s linear infinite both;
 	animation: flicker-1 2s linear infinite both;
+}
+
+/* Your CSS */
+@keyframes modalIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0px) scale(1);
+	}
+}
+
+@keyframes modalOut {
+	from {
+		opacity: 1;
+		transform: translateY(0px) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(20px) scale(0.95);
+	}
+}
+
+/* For the overlay/backdrop */
+@keyframes overlayShow {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes overlayHide {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* Target the Dialog overlay */
+.dialog-overlay-open {
+	animation: overlayShow 150ms ease-out forwards;
+}
+
+.dialog-overlay-closed {
+	animation: overlayHide 150ms ease-in forwards;
+}
+
+/* Target the DialogContent */
+.modal-content-open {
+	animation: modalIn 200ms ease-out forwards;
+}
+
+.modal-content-closed {
+	animation: modalOut 200ms ease-in forwards;
 }

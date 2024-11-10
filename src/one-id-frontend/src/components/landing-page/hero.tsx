@@ -37,7 +37,7 @@ function Hero() {
 					alt=''
 					width={1000}
 					height={1000}
-					className=' bottom-0 left-0 w-full '
+					className='absolute bottom-0 left-0 w-full '
 				/>
 			</div>
 			<img
