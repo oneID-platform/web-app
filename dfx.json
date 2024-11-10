@@ -4,13 +4,13 @@
       "main": "src/one-id-backend/main.mo",
       "type": "motoko"
     },
+    "internet_identity": {
+      "type": "pull",
+      "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+    },
     "one-id-frontend": {
-      "dependencies": [
-        "one-id-backend"
-      ],
-      "source": [
-        "src/one-id-frontend/dist"
-      ],
+      "dependencies": ["one-id-backend", "internet_identity"],
+      "source": ["src/one-id-frontend/dist"],
       "type": "assets",
       "workspace": "one-id-frontend"
     }
