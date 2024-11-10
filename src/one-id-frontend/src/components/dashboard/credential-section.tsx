@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 type CredentialsCardProps = {
 	title: string;
@@ -6,24 +6,40 @@ type CredentialsCardProps = {
 	checkCredential: string;
 };
 const CredentialsCard: React.FC<CredentialsCardProps> = (props) => {
+	const [open, setOpen] = useState(false);
 	return (
-		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
-			<div className='flex justify-center mb-4'>
-				<img
-					src={props.image}
-					alt={props.title}
-					width={1}
-					height={1}
-					className='w-16 h-16 brightness-200'
-				/>
+		<Fragment>
+			<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
+				<div className='flex justify-center mb-4'>
+					<img
+						src={props.image}
+						alt={props.title}
+						width={1}
+						height={1}
+						className='w-16 h-16 brightness-200'
+					/>
+				</div>
+				<h3 className='text-white font-bold text-lg mb-2'>{props.title}</h3>
+				<p className='text-gray-400 text-sm'>{props.checkCredential}</p>
 			</div>
-			<h3 className='text-white font-bold text-lg mb-2'>{props.title}</h3>
-			<p className='text-gray-400 text-sm'>{props.checkCredential}</p>
-		</div>
+			{open && (
+				<CrendentialModal
+					image='/icons/logo.svg'
+					title='Your NIN'
+					description='An identity number that identifys your citenship'
+				/>
+			)}
+		</Fragment>
 	);
 };
 
-const CrendentialModal: React.FC = () => {
+type CredentialsModalProps = {
+	title: string;
+	image: string;
+	description: string;
+};
+
+const CrendentialModal: React.FC<CredentialsModalProps> = (props) => {
 	return (
 		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
 			<div className='flex justify-center mb-4'>

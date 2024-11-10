@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthService } from "@/services/auth";
+import { Link } from "react-router-dom";
 
 function Header() {
 	const [principalId, setPrincipalId] = useState<string>("");
@@ -29,8 +30,8 @@ function Header() {
 				<p className='font-grotesk text-[1.6rem] font-bold'>OneID</p>
 			</div>
 			<div className='flex items-center gap-8 text-gray-400 text-sm absolute left-1/2 -translate-x-1/2'>
-				<a>Profile</a>
-				<a>Features</a>
+				<Link to='/dashboard'>Profile</Link>
+				<Link to='/dashboard/integrations'>Integrations</Link>
 				<a>About</a>
 				<a>Settings</a>
 			</div>
