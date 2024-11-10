@@ -7,7 +7,25 @@ type CredentialsCardProps = {
 };
 const CredentialsCard: React.FC<CredentialsCardProps> = (props) => {
 	return (
-		<div className='bg-[#0f0e0e] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
+		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
+			<div className='flex justify-center mb-4'>
+				<img
+					src={props.image}
+					alt={props.title}
+					width={1}
+					height={1}
+					className='w-16 h-16 brightness-200'
+				/>
+			</div>
+			<h3 className='text-white font-bold text-lg mb-2'>{props.title}</h3>
+			<p className='text-gray-400 text-sm'>{props.checkCredential}</p>
+		</div>
+	);
+};
+
+const CrendentialModal: React.FC = () => {
+	return (
+		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
 			<div className='flex justify-center mb-4'>
 				<img
 					src={props.image}

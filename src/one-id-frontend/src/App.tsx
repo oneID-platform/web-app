@@ -3,6 +3,7 @@ import LandingPage from "./pages/LandingPage";
 import "./app.css";
 import DashboardLayout from "./components/dashboard/dashboard-layout";
 import UserProfile from "./pages/user-profile";
+import Integrations from "./pages/integrations";
 
 const router = createBrowserRouter([
 	{
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
 			{
 				path: "/dashboard",
 				element: <UserProfile />,
+			},
+			{
+				path: "/dashboard/integrations",
+				element: <Integrations />,
 			},
 		],
 	},
