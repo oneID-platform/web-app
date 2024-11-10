@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AuthService } from "@/services/auth";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Header() {
 	const [principalId, setPrincipalId] = useState<string>("");
@@ -18,7 +18,7 @@ function Header() {
 	};
 
 	return (
-		<header className='flex items-center justify-between pt-8 gap-6'>
+		<header className='flex items-center justify-between pt-8 gap-6 w-[80%] mx-auto'>
 			<div className='flex gap-3 items-center'>
 				<img
 					src='/logo.svg'
@@ -30,8 +30,8 @@ function Header() {
 				<p className='font-grotesk text-[1.6rem] font-bold'>OneID</p>
 			</div>
 			<div className='flex items-center gap-8 text-gray-400 text-sm absolute left-1/2 -translate-x-1/2'>
-				<Link to='/dashboard'>Profile</Link>
-				<Link to='/dashboard/integrations'>Integrations</Link>
+				<NavLink to='/dashboard'>Profile</NavLink>
+				<NavLink to='/dashboard/integrations'>Integrations</NavLink>
 				<a>About</a>
 				<a>Settings</a>
 			</div>

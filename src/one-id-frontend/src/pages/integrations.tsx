@@ -1,59 +1,82 @@
 type IntegrationCardProps = {
 	title: string;
-	image: string;
+	image: JSX.Element;
 	checkCredential: string;
 };
 
-const credentials = [
+export const credentials = [
 	{
 		title: "Builder Score",
-		image: "",
+		image: (
+			<img
+				src='/icons/udemy.svg'
+				className='w-16 h-16 object-contain '
+			/>
+		),
 		checkCredential: "Check Credential",
 		type: "Activity",
 	},
 	{
 		title: "GitHub",
-		image: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+		image: (
+			<img
+				src='/icons/upwork.svg'
+				className='w-16 h-16 object-contain '
+			/>
+		),
 		checkCredential: "5 stars",
 		type: "Identity",
 	},
 	{
 		title: "Base Buildathon",
-		image: "",
+		image: (
+			<img
+				src='/icons/linkedIn.svg'
+				className='w-16 h-16 object-contain'
+			/>
+		),
 		checkCredential: "Check Credential",
 		type: "Skills",
 	},
 	{
 		title: "/base-builds Rounds",
-		image: "",
+		image: (
+			<img
+				src='/icons/docusign.svg'
+				className='w-16 h-16 object-contain '
+			/>
+		),
 		checkCredential: "Check Credential",
 		type: "Activity",
 	},
 	{
 		title: "Base Developer",
-		image: "",
+		image: (
+			<img
+				src='/icons/driver-license.svg'
+				className='w-16 h-16 object-contain invert-[.75]'
+			/>
+		),
 		checkCredential: "Check Credential",
 		type: "Identity",
 	},
 	{
 		title: "Base Learn",
-		image: "",
+		image: (
+			<img
+				src='/icons/mychart.svg'
+				className='w-16 h-16 object-contain'
+			/>
+		),
 		checkCredential: "Check Credential",
 		type: "Skills",
 	},
 ];
+
 function IntegrationCard(props: IntegrationCardProps) {
 	return (
 		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
-			<div className='flex justify-center mb-4'>
-				<img
-					src={props.image}
-					alt={props.title}
-					width={1}
-					height={1}
-					className='w-16 h-16 brightness-200'
-				/>
-			</div>
+			<div className='flex justify-center mb-4'>{props.image}</div>
 			<h3 className='text-gray-300 font-semibold text-lg font-grotesk text-md mb-3'>
 				{props.title}
 			</h3>
@@ -77,7 +100,7 @@ function Integrations() {
 					<IntegrationCard
 						key={index}
 						title={credential.title}
-						image={"/logo.svg"}
+						image={credential.image}
 						checkCredential={credential.checkCredential}
 					/>
 				))}

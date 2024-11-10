@@ -3,9 +3,11 @@ import { Outlet } from "react-router-dom";
 
 function DashboardLayout() {
 	return (
-		<div className='w-[80%] mx-auto bg-[#0f0e0e]'>
+		<div className='mx-auto bg-[#0f0e0e] h-screen'>
 			<Header />
-			<Outlet />
+			<div className='outlet mx-auto w-[80%]'>
+				<Outlet />
+			</div>
 		</div>
 	);
 }
