@@ -1,5 +1,6 @@
 import { AuthClient } from "@dfinity/auth-client";
 import { Identity } from "@dfinity/agent";
+import { BackendService } from "@/services/backend";
 
 export class AuthService {
   private static instance: AuthService;
@@ -32,12 +33,18 @@ export class AuthService {
 
     await this.authClient?.login({
       identityProvider:
-        // process.env.DFX_NETWORK === "ic"
-        true
+        process.env.DFX_NETWORK === "ic"
           ? "https://identity.ic0.app/#authorize"
-          : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
+          : `http://by6od-j4aaa-aaaaa-qaadq-cai.localhost:4943/#authorize`,
       maxTimeToLive: days * hours * nanoseconds,
-      onSuccess: () => {
+      onSuccess: async () => {
+        const backendService = BackendService.getInstance();
+        await backendService.init();
+        try {
+          await backendService.initializeUser();
+        } catch (error) {
+          console.log("User already initialized");
+        }
         window.location.href = "/dashboard";
       },
     });
