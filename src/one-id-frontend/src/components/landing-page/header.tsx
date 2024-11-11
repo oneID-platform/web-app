@@ -1,22 +1,30 @@
 import { useAuthStore } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const { isAuthenticated, isLoading, login, logout, checkAuth } =
     useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleAuthAction = async () => {
     if (isAuthenticated) {
       await logout();
+      navigate("/");
     } else {
       await login();
     }
   };
-
   return (
     <header className="py-3 px-5 fixed left-1/2 -translate-x-1/2 top-10 w-[50%] flex justify-between items-center z-30 backdrop-blur-xl bg-[#37383baf] shadow-xl rounded-[.8rem]">
       <div className="flex items-center gap-2">
