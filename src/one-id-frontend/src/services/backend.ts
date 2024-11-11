@@ -4,7 +4,6 @@ import {
   UserProfile,
   Credential,
   CredentialType,
-  Result,
 } from "@declarations/one-id-backend/one-id-backend.did";
 import { createActor } from "@declarations/one-id-backend";
 
