@@ -35,7 +35,7 @@ export class AuthService {
       identityProvider:
         process.env.DFX_NETWORK === "ic"
           ? "https://identity.ic0.app/#authorize"
-          : `http://by6od-j4aaa-aaaaa-qaadq-cai.localhost:4943/#authorize`,
+          : "http://br5f7-7uaaa-aaaaa-qaaca-cai.localhost:4943",
       maxTimeToLive: days * hours * nanoseconds,
       onSuccess: async () => {
         const backendService = BackendService.getInstance();
