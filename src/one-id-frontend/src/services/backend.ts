@@ -14,12 +14,12 @@ export class BackendService {
 
   private constructor() {}
 
-  public static getInstance(): BackendService {
+  public static getInstance = (): BackendService => {
     if (!BackendService.instance) {
       BackendService.instance = new BackendService();
     }
     return BackendService.instance;
-  }
+  };
 
   public async init(): Promise<void> {
     const authService = AuthService.getInstance();
@@ -41,7 +41,7 @@ export class BackendService {
     });
   }
 
-  public async getUserProfile(): Promise<UserProfile> {
+  public getUserProfile = async (): Promise<UserProfile> => {
     if (!this.actor) {
       await this.init();
     }
@@ -61,7 +61,7 @@ export class BackendService {
     }
 
     return result.ok;
-  }
+  };
 
   public async initializeUser(): Promise<void> {
     if (!this.actor) {
@@ -69,18 +69,19 @@ export class BackendService {
     }
 
     const result = await this.actor?.initializeUser()!;
+    console.log(result);
     if ("err" in result) {
       throw new Error(result.err);
     }
   }
 
-  public async submitCredential(
+  public submitCredential = async (
     title: string,
     imageUrl: string,
     description: string,
     credentialType: CredentialType,
     info: [string, string][]
-  ): Promise<void> {
+  ): Promise<void> => {
     if (!this.actor) {
       await this.init();
     }
@@ -100,9 +101,9 @@ export class BackendService {
     if ("err" in result) {
       throw new Error(result.err);
     }
-  }
+  };
 
-  public async lookupCredential(id: string): Promise<Credential> {
+  public lookupCredential = async (id: string): Promise<Credential> => {
     if (!this.actor) {
       await this.init();
     }
@@ -112,5 +113,5 @@ export class BackendService {
       throw new Error(result.err);
     }
     return result.ok;
-  }
+  };
 }

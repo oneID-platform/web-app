@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { AuthService } from "@/services/auth";
-import { useNavigate } from "react-router-dom";
 import { Identity } from "@dfinity/agent";
 
 interface AuthState {

@@ -7,21 +7,21 @@ export class AuthService {
 
   private constructor() {}
 
-  public static getInstance(): AuthService {
+  public static getInstance = (): AuthService => {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
     }
     return AuthService.instance;
-  }
+  };
 
-  public async init(): Promise<AuthClient> {
+  public init = async (): Promise<AuthClient> => {
     if (!this.authClient) {
       this.authClient = await AuthClient.create({
         idleOptions: { disableIdle: true },
       });
     }
     return this.authClient;
-  }
+  };
 
   public async login(): Promise<void> {
     if (!this.authClient) {
@@ -45,12 +45,12 @@ export class AuthService {
     });
   }
 
-  public async logout(): Promise<void> {
+  public logout = async (): Promise<void> => {
     if (!this.authClient) {
       await this.init();
     }
     await this.authClient?.logout();
-  }
+  };
 
   public async isAuthenticated(): Promise<boolean> {
     if (!this.authClient) {

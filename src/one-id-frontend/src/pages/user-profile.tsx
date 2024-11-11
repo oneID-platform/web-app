@@ -1,44 +1,48 @@
 import CredentialsSection from "@/components/dashboard/credential-section";
 import { useAuthStore } from "@/hooks/useAuth";
+import { BackendService } from "@/services/backend";
 import { useUserStore } from "@/store/user";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function UserProfile() {
   const { getIdentity } = useAuthStore();
-  const { profile, isLoading, error, fetchProfile, initializeUser } =
-    useUserStore();
+  const { profile, setProfile } = useUserStore();
   const [principalId, setPrincipalId] = useState<string>("");
+
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const backendService = BackendService.getInstance();
+      backendService.initializeUser();
+      const profile = await backendService.getUserProfile();
+      console.log(profile);
+      setProfile(profile);
+    } catch (error) {}
+  }, []);
 
   useEffect(() => {
     const identity = getIdentity();
-
     console.log(identity);
     if (identity) {
       setPrincipalId(identity.getPrincipal().toString());
-      console.log(principalId);
-      //   fetchProfile().catch((error) => {
-      //     if (error.message.includes("User not found")) {
-      //       initializeUser();
-      //     }
-      //   });
+      fetchUserProfile();
     }
-  }, [getIdentity, fetchProfile, initializeUser]);
+  }, [getIdentity]);
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-app-primary"></div>
-      </div>
-    );
-  if (error)
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 max-w-md">
-          <h3 className="text-red-500 font-medium text-lg mb-2">Error</h3>
-          <p className="text-red-400/90">{error}</p>
-        </div>
-      </div>
-    );
+  //   if (isLoading)
+  //     return (
+  //       <div className="flex items-center justify-center min-h-screen">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-app-primary"></div>
+  //       </div>
+  //     );
+  //   if (error)
+  //     return (
+  //       <div className="flex flex-col items-center justify-center min-h-screen">
+  //         <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 max-w-md">
+  //           <h3 className="text-red-500 font-medium text-lg mb-2">Error</h3>
+  //           <p className="text-red-400/90">{error}</p>
+  //         </div>
+  //       </div>
+  //     );
 
   return (
     <div className="w-[60%] mx-auto">

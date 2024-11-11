@@ -1,7 +1,11 @@
 import { X, ScanFace, Fingerprint } from "lucide-react";
 import { Fragment, ReactElement, useState, useRef } from "react";
-import { Credential } from "@declarations/one-id-backend/one-id-backend.did";
+import {
+  Credential,
+  CredentialType,
+} from "@declarations/one-id-backend/one-id-backend.did";
 import useCredentialStore from "@/hooks/useCredentials";
+import { BackendService } from "@/services/backend";
 
 const credentialIcon: { [key: string]: JSX.Element } = {
   NIN: <img src="/icons/nin.svg" className="w-16 h-16 object-contain" />,
@@ -39,6 +43,45 @@ type CredentialsCardProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
+const EmptyCredentialCard: React.FC<{
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  credentialType: string;
+  icon: JSX.Element;
+}> = ({ setOpen, credentialType, icon }) => {
+  const { setCurrentCredential } = useCredentialStore();
+
+  const handleClick = () => {
+    setOpen(true);
+    // Create a blank credential of this type
+    const emptyCredential: Credential = {
+      title: `${credentialType} Credential`,
+      description: `Add your ${credentialType}`,
+      credentialType: { [credentialType]: null } as unknown as CredentialType,
+      verificationStatus: { Pending: null },
+      info: [],
+      provided: false,
+      verificationTime: [BigInt(0)],
+      aiVerificationResult: [],
+      imageUrl: "",
+      submissionTime: BigInt(0),
+    };
+    setCurrentCredential(emptyCredential);
+  };
+
+  return (
+    <div
+      className="cursor-pointer bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center hover:bg-[#1c1a1a] opacity-50 hover:opacity-100"
+      onClick={handleClick}
+    >
+      <div className="flex justify-center mb-4">{icon}</div>
+      <h3 className="text-white font-bold text-lg mb-2 font-grotesk">
+        Add {credentialType}
+      </h3>
+      <p className="text-gray-400 text-sm">Click to add this credential</p>
+    </div>
+  );
+};
+
 const CredentialsCard: React.FC<CredentialsCardProps> = (props) => {
   const { setCurrentCredential } = useCredentialStore();
 
@@ -52,7 +95,17 @@ const CredentialsCard: React.FC<CredentialsCardProps> = (props) => {
       className="cursor-pointer bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center hover:bg-[#1c1a1a]"
       onClick={handleClick}
     >
-      <div className="flex justify-center mb-4">{props.icon}</div>
+      <div className="flex justify-center mb-4">
+        {props.credential.imageUrl ? (
+          <img
+            src={`data:image/jpeg;base64,${props.credential.imageUrl}`}
+            alt={props.title}
+            className="w-16 h-16 object-cover rounded-lg"
+          />
+        ) : (
+          props.icon
+        )}
+      </div>
       <h3 className="text-white font-bold text-lg mb-2 font-grotesk">
         {props.title}
       </h3>
@@ -70,9 +123,13 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({
   open,
   setOpen,
 }) => {
-  const { currentCredential, submitCredential } = useCredentialStore();
+  const { currentCredential, setCredentials } = useCredentialStore();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploadedFile, setUploadedFile] = useState<File>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const backendService = BackendService.getInstance();
 
   const handleAddFileClick = () => {
     fileRef.current?.click();
@@ -82,15 +139,62 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({
     const files = e.target.files;
     if (files) {
       setUploadedFile(files[0]);
+      setError(null);
     }
   };
 
   const handleAddCredential = async () => {
-    if (!currentCredential || !uploadedFile) return;
+    if (!currentCredential || !uploadedFile) {
+      setError("Please upload a file for the credential");
+      return;
+    }
 
-    // Handle credential submission here
-    // You'll need to implement file upload logic and call submitCredential
+    try {
+      setIsSubmitting(true);
+      setError(null);
+
+      // Convert file to base64 string
+      const base64String = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(",")[1]); // Remove data URL prefix
+        };
+        reader.readAsDataURL(uploadedFile);
+      });
+
+      // Submit credential with file data
+      await backendService.submitCredential(
+        currentCredential.title,
+        base64String, // Use base64 string as imageUrl
+        currentCredential.description,
+        currentCredential.credentialType,
+        currentCredential.info
+      );
+
+      // Refresh credentials list
+      const userProfile = await backendService.getUserProfile();
+      setCredentials(userProfile.credentials);
+
+      // Close modal and reset state
+      setOpen(false);
+      setUploadedFile(undefined);
+      setError(null);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Add this to show existing image
+  const existingImage = currentCredential?.imageUrl ? (
+    <img
+      className="w-24 h-24 rounded-xl object-cover border border-gray-400 p-1 mx-auto mb-4"
+      src={`data:image/jpeg;base64,${currentCredential.imageUrl}`}
+      alt="Existing credential"
+    />
+  ) : null;
 
   return (
     <Fragment>
@@ -118,22 +222,39 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({
         <input
           className="hidden"
           type="file"
+          accept="image/*"
           ref={fileRef}
           onChange={handleFileUpload}
         />
-        <button
-          className="font-grotesk bg-gray-100 text-gray-900 text-[.75rem] px-8 py-3 rounded-[.6rem] block mt-6 mx-auto"
-          onClick={handleAddFileClick}
-        >
-          Add Credential
-        </button>
-        {uploadedFile && (
-          <img
-            className="w-14 h-12 rounded-xl object-cover border border-gray-400 p-1 cursor-pointer mt-4"
-            src={URL.createObjectURL(uploadedFile)}
-            alt="Uploaded credential"
-          />
-        )}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        <div className="mt-6 space-y-4">
+          {uploadedFile ? (
+            <>
+              <img
+                className="w-24 h-24 rounded-xl object-cover border border-gray-400 p-1 mx-auto"
+                src={URL.createObjectURL(uploadedFile)}
+                alt="Uploaded credential"
+              />
+              <button
+                className="font-grotesk bg-[#cae88b] text-gray-900 text-[.75rem] px-8 py-3 rounded-[.6rem] block mx-auto disabled:opacity-50"
+                onClick={handleAddCredential}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit Credential"}
+              </button>
+            </>
+          ) : (
+            <>
+              {existingImage}
+              <button
+                className="font-grotesk bg-gray-100 text-gray-900 text-[.75rem] px-8 py-3 rounded-[.6rem] block mx-auto"
+                onClick={handleAddFileClick}
+              >
+                {currentCredential?.imageUrl ? "Change Image" : "Upload Image"}
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </Fragment>
   );
@@ -142,6 +263,19 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({
 const CredentialsSection = () => {
   const [open, setOpen] = useState(false);
   const { credentials } = useCredentialStore();
+
+  // Get all existing credential types
+  const existingTypes = credentials.map(
+    (cred) => Object.keys(cred.credentialType)[0]
+  );
+
+  // Get all available credential types
+  const availableTypes = Object.keys(credentialIcon);
+
+  // Filter out types that haven't been added yet
+  const missingTypes = availableTypes.filter(
+    (type) => !existingTypes.includes(type)
+  );
 
   return (
     <div>
@@ -154,6 +288,14 @@ const CredentialsSection = () => {
             icon={credentialIcon[Object.keys(credential.credentialType)[0]]}
             description={credential.description}
             credential={credential}
+          />
+        ))}
+        {missingTypes.map((type) => (
+          <EmptyCredentialCard
+            key={type}
+            setOpen={setOpen}
+            credentialType={type}
+            icon={credentialIcon[type]}
           />
         ))}
       </div>

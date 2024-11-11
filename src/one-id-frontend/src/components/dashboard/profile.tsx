@@ -1,21 +1,13 @@
-import { useEffect } from "react";
 import { useUserStore } from "@/store/user";
 
 export const Profile = () => {
-  const { profile, isLoading, error, fetchProfile } = useUserStore();
+  const { profile } = useUserStore();
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
-
-  if (isLoading) return <p>Loading profile...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!profile) return null;
-
+  // return <div>Hello</div>;
   return (
     <div>
       <h2>Your Credentials</h2>
-      {profile.credentials.map((credential, index) => (
+      {profile?.credentials.map((credential, index) => (
         <div key={index}>
           <h3>{credential.title}</h3>
           <p>Type: {Object.keys(credential.credentialType)[0]}</p>

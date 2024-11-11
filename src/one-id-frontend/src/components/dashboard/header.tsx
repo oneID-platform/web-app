@@ -4,13 +4,13 @@ import { NavLink } from "react-router-dom";
 import { useAuthStore } from "@/hooks/useAuth";
 
 function Header() {
-  const [principalId, setPrincipalId] = useState<string>("");
+  const [_, setPrincipalId] = useState<string>("");
   const { logout, getIdentity } = useAuthStore();
 
   useEffect(() => {
     const identity = getIdentity();
-    console.log(identity);
-
+    const principal = identity?.getPrincipal();
+    console.log(principal?.toString());
     if (identity) {
       setPrincipalId(identity.getPrincipal().toString());
     }

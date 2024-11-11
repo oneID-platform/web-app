@@ -114,29 +114,39 @@ actor OneIDPlatform {
     ) : async Result.Result<Credential, Text> {
         let caller = msg.caller;
         
-        switch (users.get(caller)) {
-            case null return #err("User not initialized");
-            case (?userProfile) {
-                let newCredential : Credential = {
-                    title = title;
-                    imageUrl = imageUrl;
-                    description = description;
-                    credentialType = credentialType;
-                    provided = true;
-                    info = info;
-                    verificationStatus = #Pending;
-                    submissionTime = Time.now();
-                    verificationTime = null;
-                    aiVerificationResult = null;
-                };
+        if (Principal.isAnonymous(caller)) {
+            return #err("Anonymous principals not allowed");
+        };
 
-                let updatedCreds = Array.append<Credential>(
+        // Validate base64 string
+        if (Text.size(imageUrl) == 0) {
+            return #err("Image data is required");
+        };
+
+        // Create new credential with the base64 image data
+        let newCredential : Credential = {
+            title = title;
+            imageUrl = imageUrl;
+            description = description;
+            credentialType = credentialType;
+            provided = true;
+            info = info;
+            verificationStatus = #Pending;
+            submissionTime = Time.now();
+            verificationTime = null;
+            aiVerificationResult = null;
+        };
+
+        switch (users.get(caller)) {
+            case null #err("User not initialized");
+            case (?userProfile) {
+                let updatedCredentials = Array.append<Credential>(
                     userProfile.credentials,
                     [newCredential]
                 );
 
                 let updatedProfile : UserProfile = {
-                    credentials = updatedCreds;
+                    credentials = updatedCredentials;
                     authorizedApps = userProfile.authorizedApps;
                     lastUpdated = Time.now();
                 };
@@ -291,6 +301,10 @@ actor OneIDPlatform {
             case (?profile) #ok(profile);
         };
     };
+
+public query func getAllUsers() : async [(Principal, UserProfile)] {
+    Iter.toArray(users.entries())
+};
 
     public query func getAppDetails(appId: Text) : async Result.Result<ThirdPartyApp, Text> {
         switch (registeredApps.get(appId)) {
