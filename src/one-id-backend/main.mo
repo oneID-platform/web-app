@@ -20,6 +20,15 @@ actor OneIDPlatform {
         #VotersCard;
     };
 
+    public type NFT = {
+    owner: Principal;
+    imageUrl: Text;
+    name: Text;
+    description: Text;
+    credentials: [Credential];  // Associated verified credentials
+    mintTime: Time.Time;
+};
+
     public type VerificationStatus = {
         #Pending;
         #Verified;
@@ -42,6 +51,7 @@ actor OneIDPlatform {
     public type UserProfile = {
         credentials: [Credential];
         authorizedApps: [AppAuthorization];
+        passport: ?NFT;  // Optional NFT, null if not minted
         lastUpdated: Time.Time;
     };
 
@@ -66,6 +76,7 @@ actor OneIDPlatform {
     // State variables
     private stable var userEntries : [(Principal, UserProfile)] = [];
     private stable var appEntries : [(Text, ThirdPartyApp)] = [];
+    private stable var totalNFTs : Nat = 0;
     private var users = HashMap.HashMap<Principal, UserProfile>(0, Principal.equal, Principal.hash);
     private var registeredApps = HashMap.HashMap<Text, ThirdPartyApp>(0, Text.equal, Text.hash);
 
@@ -96,6 +107,7 @@ actor OneIDPlatform {
                 let newProfile : UserProfile = {
                     credentials = [];
                     authorizedApps = [];
+                    passport = null;
                     lastUpdated = Time.now();
                 };
                 users.put(caller, newProfile);
@@ -148,6 +160,7 @@ actor OneIDPlatform {
                 let updatedProfile : UserProfile = {
                     credentials = updatedCredentials;
                     authorizedApps = userProfile.authorizedApps;
+                    passport = userProfile.passport;
                     lastUpdated = Time.now();
                 };
 
@@ -216,6 +229,7 @@ actor OneIDPlatform {
                         let updatedProfile : UserProfile = {
                             credentials = updatedCreds;
                             authorizedApps = userProfile.authorizedApps;
+                            passport = userProfile.passport;
                             lastUpdated = Time.now();
                         };
 
@@ -226,6 +240,72 @@ actor OneIDPlatform {
             };
         };
     };
+
+    // Add this function to mint NFT
+public shared(msg) func mintDigitalPassport(
+    name: Text,
+    description: Text,
+    imageUrl: Text,
+) : async Result.Result<NFT, Text> {
+    let caller = msg.caller;
+    
+    switch (users.get(caller)) {
+        case null return #err("User not initialized");
+        case (?userProfile) {
+            // Check if user already has an NFT
+            switch (userProfile.passport) {
+                case (?existing) return #err("User already has a digital passport NFT");
+                case null {
+                    // Get verified credentials only
+                    let verifiedCreds = Array.filter<Credential>(
+                        userProfile.credentials,
+                        func(cred: Credential) : Bool {
+                            cred.verificationStatus == #Verified
+                        }
+                    );
+
+                    if (Array.size(verifiedCreds) == 0) {
+                        return #err("No verified credentials available to create digital passport");
+                    };
+
+                    let passport : NFT = {
+                        owner = caller;
+                        imageUrl = imageUrl;
+                        name = name;
+                        description = description;
+                        credentials = verifiedCreds;
+                        mintTime = Time.now();
+                    };
+
+                    let updatedProfile : UserProfile = {
+                        credentials = userProfile.credentials;
+                        authorizedApps = userProfile.authorizedApps;
+                        lastUpdated = Time.now();
+                        passport = ?passport;
+                    };
+
+                    users.put(caller, updatedProfile);
+                    totalNFTs += 1;
+                    #ok(passport)
+                };
+            };
+        };
+    };
+};
+
+// Add function to get user's NFT
+public query func getUserNFT(user: Principal) : async Result.Result<NFT, Text> {
+    switch (users.get(user)) {
+        case null #err("User not found");
+        case (?profile) {
+            switch (profile.nft) {
+                case null #err("User has not minted a digital passport");
+                case (?nft) #ok(nft);
+            };
+        };
+    };
+};
+
 
     // App Registration and Authorization
     public shared(msg) func registerApp(
@@ -283,6 +363,7 @@ actor OneIDPlatform {
                         let updatedProfile : UserProfile = {
                             credentials = userProfile.credentials;
                             authorizedApps = updatedAuths;
+                            passport = userProfile.passport;
                             lastUpdated = Time.now();
                         };
 
