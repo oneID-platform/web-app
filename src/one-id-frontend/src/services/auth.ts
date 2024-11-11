@@ -1,6 +1,5 @@
 import { AuthClient } from "@dfinity/auth-client";
 import { Identity } from "@dfinity/agent";
-import { BackendService } from "@/services/backend";
 
 export class AuthService {
   private static instance: AuthService;
@@ -18,46 +17,45 @@ export class AuthService {
   public async init(): Promise<AuthClient> {
     if (!this.authClient) {
       this.authClient = await AuthClient.create({
-        idleOptions: {
-          disableIdle: true,
-        },
+        idleOptions: { disableIdle: true },
       });
     }
     return this.authClient;
   }
 
-  public async login(): Promise<Identity | undefined> {
+  public async login(): Promise<void> {
+    if (!this.authClient) {
+      await this.init();
+    }
+
     const days = BigInt(1);
     const hours = BigInt(24);
     const nanoseconds = BigInt(3600000000000);
 
-    await this.authClient?.login({
-      identityProvider:
-        process.env.DFX_NETWORK === "ic"
-          ? "https://identity.ic0.app/#authorize"
-          : "http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/",
-      maxTimeToLive: days * hours * nanoseconds,
-      onSuccess: async () => {
-        const backendService = BackendService.getInstance();
-        await backendService.init();
-        try {
-          await backendService.initializeUser();
-        } catch (error) {
-          console.log("User already initialized");
-        }
-        window.location.href = "/dashboard";
-      },
+    return new Promise<void>((resolve, reject) => {
+      this.authClient?.login({
+        identityProvider:
+          process.env.DFX_NETWORK === "ic"
+            ? "https://identity.ic0.app/#authorize"
+            : `http://br5f7-7uaaa-aaaaa-qaaca-cai.localhost:4943/#authorize`,
+        maxTimeToLive: days * hours * nanoseconds,
+        onSuccess: resolve,
+        onError: reject,
+      });
     });
-
-    return this.authClient?.getIdentity();
   }
 
   public async logout(): Promise<void> {
+    if (!this.authClient) {
+      await this.init();
+    }
     await this.authClient?.logout();
-    window.location.href = "/";
   }
 
   public async isAuthenticated(): Promise<boolean> {
+    if (!this.authClient) {
+      await this.init();
+    }
     return (await this.authClient?.isAuthenticated()) || false;
   }
 

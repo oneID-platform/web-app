@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { AuthService } from "@/services/auth";
+import { useNavigate } from "react-router-dom";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -18,8 +19,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ isLoading: true, error: null });
       const authService = AuthService.getInstance();
+      await authService.init();
       await authService.login();
-      set({ isAuthenticated: true, isLoading: false });
+      const isAuthenticated = await authService.isAuthenticated();
+      set({ isAuthenticated, isLoading: false });
+      if (isAuthenticated) {
+        window.location.href = "/dashboard";
+      }
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
@@ -28,8 +34,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ isLoading: true, error: null });
       const authService = AuthService.getInstance();
+      await authService.init();
       await authService.logout();
       set({ isAuthenticated: false, isLoading: false });
+      window.location.href = "/";
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
@@ -39,10 +47,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true, error: null });
       const authService = AuthService.getInstance();
       await authService.init();
-      set({
-        isAuthenticated: await authService.isAuthenticated(),
-        isLoading: false,
-      });
+      const isAuthenticated = await authService.isAuthenticated();
+      set({ isAuthenticated, isLoading: false });
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }

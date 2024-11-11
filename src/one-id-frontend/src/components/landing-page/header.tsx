@@ -1,24 +1,19 @@
-import { useEffect, useState } from "react";
-import { AuthService } from "@/services/auth";
+import { useAuthStore } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 function Header() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const authService = AuthService.getInstance();
+  const { isAuthenticated, isLoading, login, logout, checkAuth } =
+    useAuthStore();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      await authService.init();
-      const authenticated = await authService.isAuthenticated();
-      setIsAuthenticated(authenticated);
-    };
     checkAuth();
   }, []);
 
-  const handleAuth = async () => {
+  const handleAuthAction = async () => {
     if (isAuthenticated) {
-      await authService.logout();
+      await logout();
     } else {
-      await authService.login();
+      await login();
     }
   };
 
@@ -36,7 +31,7 @@ function Header() {
           OneID
         </p>
       </div>
-      <div className="flex justify-center items-center gap-6 text-sm text-gray-300  ">
+      <div className="flex justify-center items-center gap-6 text-sm text-gray-300">
         <a className="px-3" href="">
           Home
         </a>
@@ -46,16 +41,20 @@ function Header() {
         <a className="px-3" href="">
           About
         </a>
-
         <a className="px-3" href="">
           Contact
         </a>
       </div>
       <button
-        onClick={handleAuth}
-        className="text-sm bg-[#cae88b] px-6 py-[.6rem] text-gray-900 font-semibold rounded-[.7rem]"
+        onClick={handleAuthAction}
+        disabled={isLoading}
+        className="text-sm bg-[#cae88b] px-6 py-[.6rem] text-gray-900 font-semibold rounded-[.7rem] disabled:opacity-50"
       >
-        {isAuthenticated ? "Sign Out" : "Get Started"}
+        {isLoading
+          ? "Loading..."
+          : isAuthenticated
+          ? "Sign Out"
+          : "Get Started"}
       </button>
     </header>
   );

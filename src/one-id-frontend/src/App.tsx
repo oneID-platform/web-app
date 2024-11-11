@@ -4,6 +4,7 @@ import "./app.css";
 import DashboardLayout from "./components/dashboard/dashboard-layout";
 import UserProfile from "./pages/user-profile";
 import Integrations from "./pages/integrations";
+import { ProtectedRoute } from "./components/protected-route";
 
 const router = createBrowserRouter([
   {

@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { AuthService } from "@/services/auth";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/hooks/useAuth";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-	const authService = AuthService.getInstance();
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
+  const navigate = useNavigate();
 
-	useEffect(() => {
-		const checkAuth = async () => {
-			await authService.init();
-			const authenticated = await authService.isAuthenticated();
-			setIsAuthenticated(authenticated);
-		};
-		checkAuth();
-	}, []);
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
-	if (isAuthenticated === null) {
-		return <div>Loading...</div>;
-	}
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
-	return isAuthenticated ? <>{children}</> : <Navigate to='/' />;
-}
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? <>{children}</> : null;
+};
