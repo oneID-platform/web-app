@@ -114,39 +114,29 @@ actor OneIDPlatform {
     ) : async Result.Result<Credential, Text> {
         let caller = msg.caller;
         
-        if (Principal.isAnonymous(caller)) {
-            return #err("Anonymous principals not allowed");
-        };
-
-        // Validate base64 string
-        if (Text.size(imageUrl) == 0) {
-            return #err("Image data is required");
-        };
-
-        // Create new credential with the base64 image data
-        let newCredential : Credential = {
-            title = title;
-            imageUrl = imageUrl;
-            description = description;
-            credentialType = credentialType;
-            provided = true;
-            info = info;
-            verificationStatus = #Pending;
-            submissionTime = Time.now();
-            verificationTime = null;
-            aiVerificationResult = null;
-        };
-
         switch (users.get(caller)) {
-            case null #err("User not initialized");
+            case null return #err("User not initialized");
             case (?userProfile) {
-                let updatedCredentials = Array.append<Credential>(
+                let newCredential : Credential = {
+                    title = title;
+                    imageUrl = imageUrl;
+                    description = description;
+                    credentialType = credentialType;
+                    provided = true;
+                    info = info;
+                    verificationStatus = #Pending;
+                    submissionTime = Time.now();
+                    verificationTime = null;
+                    aiVerificationResult = null;
+                };
+
+                let updatedCreds = Array.append<Credential>(
                     userProfile.credentials,
                     [newCredential]
                 );
 
                 let updatedProfile : UserProfile = {
-                    credentials = updatedCredentials;
+                    credentials = updatedCreds;
                     authorizedApps = userProfile.authorizedApps;
                     lastUpdated = Time.now();
                 };
@@ -302,10 +292,6 @@ actor OneIDPlatform {
         };
     };
 
-public query func getAllUsers() : async [(Principal, UserProfile)] {
-    Iter.toArray(users.entries())
-};
-
     public query func getAppDetails(appId: Text) : async Result.Result<ThirdPartyApp, Text> {
         switch (registeredApps.get(appId)) {
             case null #err("App not found");
@@ -363,7 +349,6 @@ public query func getAllUsers() : async [(Principal, UserProfile)] {
         let timeText = Int.toText(timestamp);
         principalText # "-" # timeText;
     };
-    
     private func generateSecretText(principal:Text , timestamp: Time.Time) : Text {
         let timeText = Int.toText(timestamp);
         principal # "-" # timeText;
