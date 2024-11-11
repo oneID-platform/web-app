@@ -37,7 +37,7 @@ export class AuthService {
         identityProvider:
           process.env.DFX_NETWORK === "ic"
             ? "https://identity.ic0.app/#authorize"
-            : `http://br5f7-7uaaa-aaaaa-qaaca-cai.localhost:4943/#authorize`,
+            : `http://bkyz2-fmaaa-aaaaa-qaaaq-cai.localhost:4943/#authorize`,
         maxTimeToLive: days * hours * nanoseconds,
         onSuccess: resolve,
         onError: reject,

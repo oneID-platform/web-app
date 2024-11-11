@@ -29,7 +29,7 @@ export class BackendService {
       throw new Error("No identity found");
     }
 
-    const canisterId = "bw4dl-smaaa-aaaaa-qaacq-cai";
+    const canisterId = "bd3sg-teaaa-aaaaa-qaaba-cai";
     if (!canisterId) {
       throw new Error("Backend canister ID not found");
     }
