@@ -1,5 +1,17 @@
 {
   "canisters": {
+    "one-id-backend": {
+      "main": "src/one-id-backend/main.mo",
+      "type": "motoko"
+    },
+    "one-id-frontend": {
+      "dependencies": ["one-id-backend"],
+      "frontend": {
+        "entrypoint": "src/one-id-frontend/src/main.tsx"
+      },
+      "source": ["src/one-id-frontend/dist"],
+      "type": "assets"
+    },
     "internet_identity": {
       "type": "custom",
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
@@ -8,18 +20,7 @@
         "id": {
           "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
         }
-      },
-      "frontend": {}
-    },
-    "one-id-backend": {
-      "main": "src/one-id-backend/main.mo",
-      "type": "motoko"
-    },
-    "one-id-frontend": {
-      "dependencies": ["one-id-backend", "internet_identity"],
-      "source": ["src/one-id-frontend/dist"],
-      "type": "assets",
-      "workspace": "one-id-frontend"
+      }
     }
   },
   "defaults": {

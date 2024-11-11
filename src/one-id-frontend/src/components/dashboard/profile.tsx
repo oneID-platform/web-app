@@ -1,39 +1,32 @@
-import { useEffect, useState } from "react";
-import { BackendService } from "@/services/backend";
-import type { UserProfile } from "@/declarations/one-id-backend/actor";
+import { useEffect } from "react";
+import { useUserStore } from "@/store/user";
 
 export const Profile = () => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const backendService = BackendService.getInstance();
+  const { profile, isLoading, error, fetchProfile } = useUserStore();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userProfile = await backendService.getUserProfile();
-        setProfile(userProfile);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
     fetchProfile();
-  }, []);
+  }, [fetchProfile]);
+
+  if (isLoading) return <p>Loading profile...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!profile) return null;
 
   return (
     <div>
-      {profile ? (
-        <div>
-          <h2>Your Documents</h2>
-          {profile.documents.map((doc, index) => (
-            <div key={index}>
-              <p>Type: {Object.keys(doc.documentType)[0]}</p>
-              <p>Number: {doc.documentNumber}</p>
-              <p>Status: {Object.keys(doc.verificationStatus)[0]}</p>
-            </div>
+      <h2>Your Credentials</h2>
+      {profile.credentials.map((credential, index) => (
+        <div key={index}>
+          <h3>{credential.title}</h3>
+          <p>Type: {Object.keys(credential.credentialType)[0]}</p>
+          <p>Status: {Object.keys(credential.verificationStatus)[0]}</p>
+          {credential.info.map(([key, value], idx) => (
+            <p key={idx}>
+              {key}: {value}
+            </p>
           ))}
         </div>
-      ) : (
-        <p>Loading profile...</p>
-      )}
+      ))}
     </div>
   );
 };

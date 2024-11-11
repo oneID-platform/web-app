@@ -14,7 +14,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      declarations: path.resolve(__dirname, "../declarations"),
+      "@declarations": path.resolve(__dirname, "../declarations"),
     },
   },
   define: {
@@ -24,6 +24,9 @@ export default defineConfig({
     target: "esnext",
     commonjsOptions: {
       transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      external: ["@declarations/one-id-backend"],
     },
   },
   server: {

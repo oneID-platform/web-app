@@ -353,4 +353,17 @@ actor OneIDPlatform {
         let timeText = Int.toText(timestamp);
         principal # "-" # timeText;
     };
+
+    // Add this to your OneIDPlatform actor in main.mo
+    public query func lookup(id: Text) : async Result.Result<Credential, Text> {
+        switch (users.get(Principal.fromText(id))) {
+            case null #err("User not found");
+            case (?profile) {
+                switch (Array.find<Credential>(profile.credentials, func(c) = c.title == id)) {
+                    case null #err("Credential not found");
+                    case (?credential) #ok(credential);
+                };
+            };
+        };
+    };
 }

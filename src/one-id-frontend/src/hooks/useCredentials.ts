@@ -1,128 +1,62 @@
 import { create } from "zustand";
+import { BackendService } from "@/services/backend";
+import { Credential, CredentialType } from "@/types/backend";
 
-const credentials: Credential[] = [
-	{
-		title: "Face ID",
-		imageUrl: "",
-		icon: "faceid",
-		type: "Skill certifications",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-	{
-		title: "NIN",
-		imageUrl: "",
-		icon: "nin",
-		type: "ID documents",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-	{
-		title: "Finger Print",
-		imageUrl: "",
-		icon: "fingerprint",
-		type: "Access authorizations",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-	{
-		title: "Nationa ID",
-		imageUrl: "",
-		icon: "national-id",
-		type: "ID documents",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-	{
-		title: "Passport",
-		imageUrl: "",
-		icon: "passport",
-		type: "ID documents",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-	{
-		title: "Driver License",
-		icon: "driver-license",
-		imageUrl: "",
-		type: "Skill certifications",
-		description: "",
-		provided: true,
-		info: {
-			"Skill Level": "Expert",
-			"Certification Authority": "Apple",
-			"Certification Date": "2021-09-12",
-			"Expiration Date": "2023-09-12",
-		},
-	},
-];
-
-type CredentialType =
-	| "Degrees, Diplomas"
-	| "Occupation licenses"
-	| "Skill certifications"
-	| "Online badges"
-	| "ID documents"
-	| "Access authorizations"
-	| "Professional memberships";
-
-export type Credential = {
-	title: string;
-	imageUrl: string;
-	description: string;
-	type: CredentialType;
-	icon: string;
-	provided: boolean;
-	info: {
-		[key: string]: string;
-	};
-};
 interface CredentialState {
-	credentials: Credential[];
-	currentCredential: Credential | null;
-	setCurrentCredential: (credential: Credential) => void;
+  credentials: Credential[];
+  currentCredential: Credential | null;
+  isLoading: boolean;
+  error: string | null;
+  setCurrentCredential: (credential: Credential) => void;
+  fetchCredentials: () => Promise<void>;
+  submitCredential: (
+    title: string,
+    imageUrl: string,
+    description: string,
+    credentialType: CredentialType,
+    info: [string, string][]
+  ) => Promise<void>;
 }
 
 const useCredentialStore = create<CredentialState>((set) => ({
-	credentials: credentials,
-	currentCredential: null,
-	setCurrentCredential: (credential) => {
-		set(() => {
-			return {
-				currentCredential: credential,
-			};
-		});
-	},
+  credentials: [],
+  currentCredential: null,
+  isLoading: false,
+  error: null,
+  setCurrentCredential: (credential) => set({ currentCredential: credential }),
+  fetchCredentials: async () => {
+    try {
+      set({ isLoading: true, error: null });
+      const backendService = BackendService.getInstance();
+      const profile = await backendService.getUserProfile();
+      set({ credentials: profile.credentials, isLoading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+  submitCredential: async (
+    title,
+    imageUrl,
+    description,
+    credentialType,
+    info
+  ) => {
+    try {
+      set({ isLoading: true, error: null });
+      const backendService = BackendService.getInstance();
+      await backendService.submitCredential(
+        title,
+        imageUrl,
+        description,
+        credentialType,
+        info
+      );
+      const profile = await backendService.getUserProfile();
+      set({ credentials: profile.credentials, isLoading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
 }));
 
 export default useCredentialStore;
