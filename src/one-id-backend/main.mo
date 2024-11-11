@@ -349,6 +349,7 @@ actor OneIDPlatform {
         let timeText = Int.toText(timestamp);
         principalText # "-" # timeText;
     };
+    
     private func generateSecretText(principal:Text , timestamp: Time.Time) : Text {
         let timeText = Int.toText(timestamp);
         principal # "-" # timeText;

@@ -1,12 +1,17 @@
 import { create } from "zustand";
+import {
+  Credential,
+  CredentialType,
+} from "@declarations/one-id-backend/one-id-backend.did";
 import { BackendService } from "@/services/backend";
-import { Credential, CredentialType } from "@/types/backend";
 
 interface CredentialState {
   credentials: Credential[];
   currentCredential: Credential | null;
   isLoading: boolean;
   error: string | null;
+}
+interface CredentialActions {
   setCurrentCredential: (credential: Credential) => void;
   fetchCredentials: () => Promise<void>;
   submitCredential: (
@@ -18,7 +23,9 @@ interface CredentialState {
   ) => Promise<void>;
 }
 
-const useCredentialStore = create<CredentialState>((set) => ({
+export type CredentialStore = CredentialState & CredentialActions;
+
+const useCredentialStore = create<CredentialStore>((set) => ({
   credentials: [],
   currentCredential: null,
   isLoading: false,

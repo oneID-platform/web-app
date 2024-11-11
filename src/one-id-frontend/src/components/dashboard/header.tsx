@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { AuthService } from "@/services/auth";
+
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "@/hooks/useAuth";
 
 function Header() {
   const [principalId, setPrincipalId] = useState<string>("");
-  const { logout } = useAuthStore();
-  const authService = AuthService.getInstance();
+  const { logout, getIdentity } = useAuthStore();
 
   useEffect(() => {
-    const identity = authService.getIdentity();
+    const identity = getIdentity();
+    console.log(identity);
 
     if (identity) {
       setPrincipalId(identity.getPrincipal().toString());
     }
-  }, []);
+  }, [getIdentity]);
 
   const handleLogout = async () => {
     await logout();

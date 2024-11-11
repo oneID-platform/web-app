@@ -1,10 +1,12 @@
 import { AuthService } from "@/services/auth";
 import {
-  init,
   _SERVICE as OneIDPlatform,
+  UserProfile,
+  Credential,
+  CredentialType,
+  Result,
 } from "@declarations/one-id-backend/one-id-backend.did";
 import { createActor } from "@declarations/one-id-backend";
-import { Principal } from "@dfinity/principal";
 
 export class BackendService {
   private static instance: BackendService;
@@ -27,9 +29,9 @@ export class BackendService {
       throw new Error("No identity found");
     }
 
-    const canisterId = process.env.NEXT_PUBLIC_BACKEND_CANISTER_ID;
+    const canisterId = "bw4dl-smaaa-aaaaa-qaacq-cai";
     if (!canisterId) {
-      throw new Error("Backend canister ID not found in environment variables");
+      throw new Error("Backend canister ID not found");
     }
 
     this.actor = createActor(canisterId, {
@@ -39,10 +41,76 @@ export class BackendService {
     });
   }
 
-  public getActor(): OneIDPlatform {
+  public async getUserProfile(): Promise<UserProfile> {
     if (!this.actor) {
-      throw new Error("Backend service not initialized");
+      await this.init();
     }
-    return this.actor;
+
+    const identity = AuthService.getInstance().getIdentity();
+    if (!identity) {
+      throw new Error("No identity found");
+    }
+
+    const result = await this.actor?.getUserProfile(identity.getPrincipal());
+    if (!result) {
+      throw new Error("Failed to get user profile");
+    }
+
+    if ("err" in result) {
+      throw new Error(result.err);
+    }
+
+    return result.ok;
+  }
+
+  public async initializeUser(): Promise<void> {
+    if (!this.actor) {
+      await this.init();
+    }
+
+    const result = await this.actor?.initializeUser()!;
+    if ("err" in result) {
+      throw new Error(result.err);
+    }
+  }
+
+  public async submitCredential(
+    title: string,
+    imageUrl: string,
+    description: string,
+    credentialType: CredentialType,
+    info: [string, string][]
+  ): Promise<void> {
+    if (!this.actor) {
+      await this.init();
+    }
+
+    const result = await this.actor?.submitCredential(
+      title,
+      imageUrl,
+      description,
+      credentialType,
+      info
+    );
+
+    if (!result) {
+      throw new Error("Failed to submit credential");
+    }
+
+    if ("err" in result) {
+      throw new Error(result.err);
+    }
+  }
+
+  public async lookupCredential(id: string): Promise<Credential> {
+    if (!this.actor) {
+      await this.init();
+    }
+
+    const result = await this.actor?.lookup(id)!;
+    if ("err" in result) {
+      throw new Error(result.err);
+    }
+    return result.ok;
   }
 }

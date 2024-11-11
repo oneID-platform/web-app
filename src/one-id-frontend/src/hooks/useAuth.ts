@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AuthService } from "@/services/auth";
 import { useNavigate } from "react-router-dom";
+import { Identity } from "@dfinity/agent";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -9,6 +10,7 @@ interface AuthState {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  getIdentity: () => Identity | null;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -52,5 +54,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
+  },
+  getIdentity: () => {
+    const authService = AuthService.getInstance();
+    return authService.getIdentity() || null;
   },
 }));

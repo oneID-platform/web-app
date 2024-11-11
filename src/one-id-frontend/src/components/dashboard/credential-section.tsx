@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { ScanFace, Fingerprint } from "lucide-react";
 import useCredentialStore from "@/hooks/useCredentials";
 
@@ -29,7 +29,7 @@ export const CredentialsSection = () => {
   }, [fetchCredentials]);
 
   if (isLoading) return <p>Loading credentials...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (error) return <p>Error: {error} dalsdf</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
