@@ -16,6 +16,8 @@
     "src/one-id-frontend"
   ],
   "dependencies": {
+    "@cloudinary/react": "^1.13.1",
+    "@cloudinary/url-gen": "^1.21.0",
     "@dfinity/agent": "^1.4.0",
     "@dfinity/auth-client": "^1.4.0",
     "@dfinity/candid": "^1.4.0",
