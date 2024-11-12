@@ -212,3 +212,96 @@
 .modal-content-closed {
 	animation: modalOut 200ms ease-in forwards;
 }
+
+.nft-card {
+	--s: 13px; /* control the size*/
+	--c1: #c0d860;
+	--c2: #604848;
+
+	--_c: #0000 75%, var(--c1) 0;
+	--_g1: conic-gradient(at 10% 50%, var(--_c));
+	--_g2: conic-gradient(at 50% 10%, var(--_c));
+	background: var(--_g1), var(--_g1) calc(1 * var(--s)) calc(3 * var(--s)),
+		var(--_g1) calc(2 * var(--s)) calc(1 * var(--s)),
+		var(--_g1) calc(3 * var(--s)) calc(4 * var(--s)),
+		var(--_g1) calc(4 * var(--s)) calc(2 * var(--s)),
+		var(--_g2) 0 calc(4 * var(--s)),
+		var(--_g2) calc(1 * var(--s)) calc(2 * var(--s)),
+		var(--_g2) calc(2 * var(--s)) 0,
+		var(--_g2) calc(3 * var(--s)) calc(3 * var(--s)),
+		var(--_g2) calc(4 * var(--s)) calc(1 * var(--s)), var(--c2);
+	background-size: calc(5 * var(--s)) calc(5 * var(--s));
+}
+
+/*--------------------------------
+				ICON SHINE
+---------------------------------*/
+/*---
+  icon
+---*/
+
+.nft-modal {
+	overflow: hidden;
+	position: relative;
+	/* width: 50px;
+	height: 50px;
+	display: inline-block;
+
+	margin: 25px 0 25px 25px;
+	border-radius: 5px;
+	color: #fff;
+	text-decoration: none;
+	text-align: center;
+	line-height: 50px;
+	font-size: 12px;
+	font-family: sans-serif; */
+}
+
+/*---
+  shine animation
+---*/
+
+.nft-modal:after {
+	content: "";
+	position: absolute;
+	top: -110%;
+	left: -210%;
+	width: 200%;
+	height: 200%;
+	opacity: 0;
+	transform: rotate(30deg);
+
+	background: rgba(255, 255, 255, 0.13);
+	background: linear-gradient(
+		to right,
+		rgba(255, 255, 255, 0.13) 0%,
+		rgba(255, 255, 255, 0.13) 77%,
+		rgba(255, 255, 255, 0.5) 92%,
+		rgba(255, 255, 255, 0) 100%
+	);
+}
+
+/*---
+  hover trigger
+---*/
+
+.nft-modal:hover:after {
+	opacity: 1;
+	top: -30%;
+	left: -30%;
+	transition-property: left, top, opacity;
+	transition-duration: 0.7s, 0.7s, 0.15s;
+	transition-timing-function: ease;
+}
+
+/*---
+  active state
+---*/
+
+.nft-modal:active:after {
+	opacity: 0;
+}
+
+/*--------------------------------
+				END ICON SHINE
+---------------------------------*/
