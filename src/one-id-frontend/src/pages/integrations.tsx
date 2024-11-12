@@ -6,7 +6,7 @@ type IntegrationCardProps = {
 
 export const credentials = [
 	{
-		title: "Builder Score",
+		title: "Udemy",
 		image: (
 			<img
 				src='/icons/udemy.svg'
@@ -17,7 +17,7 @@ export const credentials = [
 		type: "Activity",
 	},
 	{
-		title: "GitHub",
+		title: "Upwork",
 		image: (
 			<img
 				src='/icons/upwork.svg'
@@ -28,7 +28,7 @@ export const credentials = [
 		type: "Identity",
 	},
 	{
-		title: "Base Buildathon",
+		title: "LinkedIn",
 		image: (
 			<img
 				src='/icons/linkedIn.svg'
@@ -39,7 +39,7 @@ export const credentials = [
 		type: "Skills",
 	},
 	{
-		title: "/base-builds Rounds",
+		title: "Docusign",
 		image: (
 			<img
 				src='/icons/docusign.svg'
@@ -50,7 +50,7 @@ export const credentials = [
 		type: "Activity",
 	},
 	{
-		title: "Base Developer",
+		title: "Docusign",
 		image: (
 			<img
 				src='/icons/driver-license.svg'
@@ -61,7 +61,7 @@ export const credentials = [
 		type: "Identity",
 	},
 	{
-		title: "Base Learn",
+		title: "MyChart",
 		image: (
 			<img
 				src='/icons/mychart.svg'
