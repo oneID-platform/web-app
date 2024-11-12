@@ -288,7 +288,7 @@ public query func getUserNFT(user: Principal) : async Result.Result<NFT, Text> {
     switch (users.get(user)) {
         case null #err("User not found");
         case (?profile) {
-            switch (profile.nft) {
+            switch (profile.passport) {
                 case null #err("User has not minted a digital passport");
                 case (?nft) #ok(nft);
             };
