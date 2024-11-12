@@ -68,7 +68,9 @@ function UserProfile() {
 							</p>
 						</div>
 					</div>
-					<button className='bg-app-primary flex justify-center items-center gap-1 px-8 py-2 text-[1rem] text-gray-800 rounded-[.6rem]'>
+					<button
+						className='bg-app-primary flex justify-center items-center gap-1 px-8 py-2 text-[1rem] text-gray-800 rounded-[.6rem]'
+						onClick={() => setShowNFT(true)}>
 						<img
 							src='/icons/mint.svg'
 							alt=''
@@ -81,12 +83,12 @@ function UserProfile() {
 				</div>
 				<CredentialsSection />
 			</div>
-			{/* {showNFT && (
+			{showNFT && (
 				<MintedIdCard
 					principalID={principalId}
 					setShowNFT={setShowNFT}
 				/>
-			)} */}
+			)}
 		</Fragment>
 	);
 }
