@@ -1,7 +1,7 @@
 import { Fragment } from "react/jsx-runtime";
 import { X } from "lucide-react";
 import html2canvas from "html2canvas";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import showToast from "@/lib/utils";
 import { one_id_backend } from "@declarations/one-id-backend";
 import { BackendService } from "@/services/backend";
