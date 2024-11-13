@@ -1,86 +1,84 @@
 type IntegrationCardProps = {
-	title: string;
-	image: JSX.Element;
-	checkCredential: string;
+	name: string;
+	description: string;
+	redirectUri: string;
+	requiredCredentials: string[];
+	image?: string;
 };
 
-export const credentials = [
-	{
-		title: "Udemy",
-		image: (
-			<img
-				src='/icons/udemy.svg'
-				className='w-16 h-16 object-contain '
-			/>
-		),
-		checkCredential: "Check Credential",
-		type: "Activity",
+const integrations = {
+	fintech_apps: {
+		kuda: {
+			name: "Kuda Bank",
+			description: "Digital Banking Platform",
+			redirectUri: "https://kuda.com/verify",
+			requiredCredentials: ["NIN", "BVN", "FaceID"],
+			image: "/icons/kuda.svg",
+		},
+		opay: {
+			name: "OPay",
+			description: "Digital Payment Platform",
+			redirectUri: "https://opay.com/verify",
+			requiredCredentials: ["NIN", "BVN"],
+			image: "/icons/opay.svg",
+		},
+		palmpay: {
+			name: "PalmPay",
+			description: "Digital Payment Platform",
+			redirectUri: "https://palmpay.com/verify",
+			requiredCredentials: ["NIN", "BVN"],
+			image: "/icons/palmpay.svg",
+		},
 	},
-	{
-		title: "Upwork",
-		image: (
-			<img
-				src='/icons/upwork.svg'
-				className='w-16 h-16 object-contain '
-			/>
-		),
-		checkCredential: "5 stars",
-		type: "Identity",
+	crypto_exchanges: {
+		binance: {
+			name: "Binance Nigeria",
+			description: "Cryptocurrency Exchange",
+			redirectUri: "https://binance.com/ng/verify",
+			requiredCredentials: ["NIN", "BVN", "InternationalPassport"],
+			image: "/icons/binance.svg",
+		},
+		quidax: {
+			name: "Quidax",
+			description: "Nigerian Crypto Exchange",
+			redirectUri: "https://quidax.com/verify",
+			requiredCredentials: ["NIN", "BVN"],
+			image: "/icons/quidax.svg",
+		},
 	},
-	{
-		title: "LinkedIn",
-		image: (
-			<img
-				src='/icons/linkedIn.svg'
-				className='w-16 h-16 object-contain'
-			/>
-		),
-		checkCredential: "Check Credential",
-		type: "Skills",
-	},
-	{
-		title: "Docusign",
-		image: (
-			<img
-				src='/icons/docusign.svg'
-				className='w-16 h-16 object-contain '
-			/>
-		),
-		checkCredential: "Check Credential",
-		type: "Activity",
-	},
-	{
-		title: "Docusign",
-		image: (
-			<img
-				src='/icons/driver-license.svg'
-				className='w-16 h-16 object-contain invert-[.75]'
-			/>
-		),
-		checkCredential: "Check Credential",
-		type: "Identity",
-	},
-	{
-		title: "MyChart",
-		image: (
-			<img
-				src='/icons/mychart.svg'
-				className='w-16 h-16 object-contain'
-			/>
-		),
-		checkCredential: "Check Credential",
-		type: "Skills",
-	},
-];
+};
 
-function IntegrationCard(props: IntegrationCardProps) {
+function IntegrationCard({
+	name,
+	description,
+	requiredCredentials,
+	image,
+}: IntegrationCardProps) {
 	return (
 		<div className='bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center'>
-			<div className='flex justify-center mb-4'>{props.image}</div>
-			<h3 className='text-gray-300 font-semibold text-lg font-grotesk text-md mb-3'>
-				{props.title}
+			<div className='flex justify-center mb-4'>
+				{image && (
+					<img
+						src={image}
+						alt={name}
+						className='w-16 h-16 object-contain'
+					/>
+				)}
+			</div>
+			<h3 className='text-gray-300 font-semibold text-lg font-grotesk mb-2'>
+				{name}
 			</h3>
-			<button className='text-sm text-gray-950 bg-gray-300 rounded-[1rem] px-10 py-2'>
+			<p className='text-gray-400 text-sm mb-4'>{description}</p>
+			<div className='flex flex-wrap gap-2 justify-center mb-4'>
+				{requiredCredentials.map((cred) => (
+					<span
+						key={cred}
+						className='text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded'>
+						{cred}
+					</span>
+				))}
+			</div>
+			<button className='text-sm text-gray-950 bg-gray-300 rounded-[1rem] px-10 py-2 hover:bg-gray-400 transition-colors'>
 				Connect
 			</button>
 		</div>
@@ -88,6 +86,10 @@ function IntegrationCard(props: IntegrationCardProps) {
 }
 
 function Integrations() {
+	const allIntegrations = Object.values(integrations).flatMap((category) =>
+		Object.values(category)
+	);
+
 	return (
 		<div className='w-[60%] mx-auto pt-14 mb-[3rem]'>
 			<h1 className='text-4xl mb-2 font-grotesk'>Integrations</h1>
@@ -96,16 +98,15 @@ function Integrations() {
 				credentials and improve your Builder Score
 			</p>
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-				{credentials.map((credential, index) => (
+				{allIntegrations.map((integration, index) => (
 					<IntegrationCard
 						key={index}
-						title={credential.title}
-						image={credential.image}
-						checkCredential={credential.checkCredential}
+						{...integration}
 					/>
 				))}
 			</div>
 		</div>
 	);
 }
+
 export default Integrations;

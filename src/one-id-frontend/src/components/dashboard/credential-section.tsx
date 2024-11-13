@@ -1,5 +1,5 @@
 import { X, ScanFace, Fingerprint } from "lucide-react";
-import { Fragment, ReactElement, useState, useRef } from "react";
+import { Fragment, useState, useRef } from "react";
 import {
 	Credential,
 	CredentialType,
@@ -48,15 +48,7 @@ const credentialIcon: { [key: string]: JSX.Element } = {
 	),
 };
 
-type CredentialsCardProps = {
-	title: string;
-	icon: ReactElement;
-	description: string;
-	credential: Credential;
-	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const EmptyCredentialCard: React.FC<{
+const CredentialCard: React.FC<{
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	credentialType: string;
 	icon: JSX.Element;
@@ -67,7 +59,7 @@ const EmptyCredentialCard: React.FC<{
 		setOpen(true);
 		// Create a blank credential of this type
 		const emptyCredential: Credential = {
-			title: `${credentialType} Credential`,
+			title: `${credentialType}`,
 			description: `Add your ${credentialType}`,
 			credentialType: {
 				[credentialType]: null,
@@ -89,40 +81,9 @@ const EmptyCredentialCard: React.FC<{
 			onClick={handleClick}>
 			<div className='flex justify-center mb-4'>{icon}</div>
 			<h3 className='text-white font-bold text-lg mb-2 font-grotesk'>
-				Add {credentialType}
+				{credentialType}
 			</h3>
 			<p className='text-gray-400 text-sm'>Click to add this credential</p>
-		</div>
-	);
-};
-
-const CredentialsCard: React.FC<CredentialsCardProps> = (props) => {
-	const { setCurrentCredential } = useCredentialStore();
-
-	const handleClick = () => {
-		props.setOpen(true);
-		setCurrentCredential(props.credential);
-	};
-
-	return (
-		<div
-			className='cursor-pointer bg-[#121111] rounded-xl p-8 w-full border border-[#3e3e3ed6] text-center hover:bg-[#1c1a1a]'
-			onClick={handleClick}>
-			<div className='flex justify-center mb-4'>
-				{props.credential.imageUrl ? (
-					<img
-						src={`data:image/jpeg;base64,${props.credential.imageUrl}`}
-						alt={props.title}
-						className='w-16 h-16 object-cover rounded-lg'
-					/>
-				) : (
-					props.icon
-				)}
-			</div>
-			<h3 className='text-white font-bold text-lg mb-2 font-grotesk'>
-				{props.title}
-			</h3>
-			<p className='text-gray-400 text-sm'>{props.description}</p>
 		</div>
 	);
 };
@@ -132,10 +93,7 @@ type CredentialsModalProps = {
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const CredentialModal: React.FC<CredentialsModalProps> = ({
-	open,
-	setOpen,
-}) => {
+const CredentialModal: React.FC<CredentialsModalProps> = ({ setOpen }) => {
 	const { currentCredential, setCredentials } = useCredentialStore();
 	const fileRef = useRef<HTMLInputElement>(null);
 	const [uploadedFile, setUploadedFile] = useState<File>();
@@ -200,7 +158,6 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({
 		}
 	};
 
-	// Add this to show existing image
 	const existingImage = currentCredential?.imageUrl ? (
 		<img
 			className='w-24 h-24 rounded-xl object-cover border border-gray-400 p-1 mx-auto mb-4'
@@ -278,36 +235,14 @@ const CredentialsSection = () => {
 	const [open, setOpen] = useState(false);
 	const { credentials } = useCredentialStore();
 
-	// Get all existing credential types
-	const existingTypes = credentials.map(
-		(cred) => Object.keys(cred.credentialType)[0]
-	);
-
 	// Get all available credential types
 	const availableTypes = Object.keys(credentialIcon);
-
-	// Filter out types that haven't been added yet
-	const missingTypes = availableTypes.filter(
-		(type) => !existingTypes.includes(type)
-	);
 
 	return (
 		<div>
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-				{credentials.map((credential, index) => (
-					<CredentialsCard
-						key={index}
-						setOpen={setOpen}
-						title={credential.title}
-						icon={
-							credentialIcon[Object.keys(credential.credentialType)[0]]
-						}
-						description={credential.description}
-						credential={credential}
-					/>
-				))}
-				{missingTypes.map((type) => (
-					<EmptyCredentialCard
+				{availableTypes.map((type) => (
+					<CredentialCard
 						key={type}
 						setOpen={setOpen}
 						credentialType={type}

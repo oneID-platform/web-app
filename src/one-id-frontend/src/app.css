@@ -305,3 +305,23 @@
 /*--------------------------------
 				END ICON SHINE
 ---------------------------------*/
+
+.dashboard-layout {
+	display: grid;
+	grid-template-columns: 100%;
+	grid-template-rows: 10vh 90vh;
+	height: 100vh;
+	overflow: hidden;
+	gap: 1rem;
+
+	header {
+		grid-template-columns: 1/-1;
+		grid-row: 1/2;
+	}
+
+	.outlet {
+		grid-template-columns: 1/-1;
+		grid-row: 2/3;
+		overflow-y: scroll;
+	}
+}

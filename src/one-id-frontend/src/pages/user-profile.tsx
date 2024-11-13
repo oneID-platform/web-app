@@ -10,14 +10,13 @@ function UserProfile() {
 	const { profile, setProfile } = useUserStore();
 	const [principalId, setPrincipalId] = useState<string>("");
 
-	const [showNFT, setShowNFT] = useState(true);
+	const [showNFT, setShowNFT] = useState(false);
 
 	const fetchUserProfile = useCallback(async () => {
 		try {
 			const backendService = BackendService.getInstance();
 			backendService.initializeUser();
 			const profile = await backendService.getUserProfile();
-			console.log(profile);
 			setProfile(profile);
 		} catch (error) {}
 	}, []);
@@ -30,22 +29,6 @@ function UserProfile() {
 			fetchUserProfile();
 		}
 	}, [getIdentity]);
-
-	//   if (isLoading)
-	//     return (
-	//       <div className="flex items-center justify-center min-h-screen">
-	//         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-app-primary"></div>
-	//       </div>
-	//     );
-	//   if (error)
-	//     return (
-	//       <div className="flex flex-col items-center justify-center min-h-screen">
-	//         <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 max-w-md">
-	//           <h3 className="text-red-500 font-medium text-lg mb-2">Error</h3>
-	//           <p className="text-red-400/90">{error}</p>
-	//         </div>
-	//       </div>
-	//     );
 
 	return (
 		<Fragment>

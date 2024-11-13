@@ -254,10 +254,6 @@ public shared(msg) func mintDigitalPassport(
                         }
                     );
 
-                    if (Array.size(verifiedCreds) == 0) {
-                        return #err("No verified credentials available to create digital passport");
-                    };
-
                     let passport : NFT = {
                         owner = caller;
                         imageUrl = imageUrl;
@@ -273,7 +269,6 @@ public shared(msg) func mintDigitalPassport(
                         lastUpdated = Time.now();
                         passport = ?passport;
                     };
-
                     users.put(caller, updatedProfile);
                     totalNFTs += 1;
                     #ok(passport)
@@ -423,13 +418,7 @@ public query func getUserNFT(user: Principal) : async Result.Result<NFT, Text> {
             };
         };
     };
-
-    // Helper Functions
-    private func generateSecret(principal: Principal , timestamp: Time.Time) : Text {
-        let principalText = Principal.toText(principal);
-        let timeText = Int.toText(timestamp);
-        principalText # "-" # timeText;
-    };
+    
     private func generateSecretText(principal:Text , timestamp: Time.Time) : Text {
         let timeText = Int.toText(timestamp);
         principal # "-" # timeText;
