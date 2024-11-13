@@ -6,6 +6,7 @@ import {
 } from "@declarations/one-id-backend/one-id-backend.did";
 import useCredentialStore from "@/hooks/useCredentials";
 import { BackendService } from "@/services/backend";
+import showToast from "@/lib/utils";
 
 const credentialIcon: { [key: string]: JSX.Element } = {
 	NIN: (
@@ -148,6 +149,7 @@ const CredentialModal: React.FC<CredentialsModalProps> = ({ setOpen }) => {
 			setCredentials(userProfile.credentials);
 
 			// Close modal and reset state
+			showToast.success("Upload credential successfully");
 			setOpen(false);
 			setUploadedFile(undefined);
 			setError(null);

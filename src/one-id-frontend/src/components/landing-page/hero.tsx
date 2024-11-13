@@ -59,11 +59,10 @@ function Hero() {
 						/>
 					</span>
 
-					<p>Verify Once, Use Everywhere Securely</p>
+					<p>One Identity, Endless Possiblilites</p>
 				</div>
-				<h1 className='font-grotesk text-[3.6rem]  leading-[4.7rem] text-gray-200'>
-					Unifying Personal Authentication
-					<br /> with Smart Verification{" "}
+				<h1 className='font-grotesk text-[4.1rem]  leading-[4.7rem] text-gray-200'>
+					Verify Once, Use everywhere{" "}
 					<img
 						src='/icons/finger-print.svg'
 						alt=''
@@ -73,9 +72,10 @@ function Hero() {
 					/>
 				</h1>
 				<p className=' text-gray-300 mt-3 leading-6 text-[1rem]'>
-					Experience seamless authentication through our unified platform,
-					where verification becomes <br /> instant and your digital
-					identity works everywhere you need it.
+					Say goodbye to multiple wallets and complicated sign-ins. OneID
+					provides a single, secure identity <br /> for all your
+					KYC-enabled applications, making your user experience seamless
+					and stress-free.
 				</p>
 				<div className='flex items-center justify-center gap-6 mt-10'>
 					<button className='bg-[#cae88b]  px-[1.6rem] py-3  text-gray-800 text-[1.1rem] rounded-[.5rem] flex gap-1 items-center'>

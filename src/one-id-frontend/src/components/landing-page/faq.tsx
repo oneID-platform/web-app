@@ -6,29 +6,29 @@ const FAQAccordion = () => {
 
 	const faqData = [
 		{
-			question: "How does Replex work?",
+			question: "How does OneID work?",
 			answer:
-				"Replex uses AI to analyze incoming messages and replies instantly, ensuring efficient customer interactions across various platforms.",
+				"OneID allows users to submit documents once and verifies their identity across multiple platforms using AI-powered instant verification.",
 		},
 		{
-			question: "Does Replex work with my systems?",
+			question: "Does OneID work with my systems?",
 			answer:
-				"Replex integrates seamlessly with most common business systems and platforms.",
+				"OneID integrates seamlessly with various major platforms in fintech, crypto, and telecom sectors.",
 		},
 		{
-			question: "Is Replex suitable for small businesses?",
+			question: "Is OneID suitable for small businesses?",
 			answer:
-				"Yes, Replex is designed to scale for businesses of all sizes.",
+				"Yes, OneID is designed to scale efficiently for businesses of all sizes, enhancing their KYC processes.",
 		},
 		{
-			question: "How secure is Replex?",
+			question: "How secure is OneID?",
 			answer:
-				"Replex implements enterprise-grade security protocols to protect your data.",
+				"OneID implements bank-grade encryption and decentralized storage to ensure the highest level of data security.",
 		},
 		{
-			question: "Does Replex require technical expertise?",
+			question: "Does OneID require technical expertise?",
 			answer:
-				"No, Replex is designed to be user-friendly and requires minimal technical knowledge.",
+				"No, OneID is user-friendly and requires minimal technical knowledge for setup and operation.",
 		},
 	];
 

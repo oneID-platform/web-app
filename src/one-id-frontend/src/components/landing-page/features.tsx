@@ -38,39 +38,39 @@ const Features = () => {
 	const features = [
 		{
 			Icon: Network,
-			title: "Enhanced Online Presence",
+			title: "Automated Online Process",
 			description:
-				"Stand out in the digital landscape with a professionally crafted website that captivates and engages your audience effectively.",
+				"One-time document submission, AI-powered instant verification, and an 89% reduction in KYC friction.",
 		},
 		{
 			Icon: Leaf,
-			title: "Increased Brand Visibility",
+			title: "Universal Secure Updating",
 			description:
-				"Boost brand recognition and visibility across various online platforms, attracting more potential customers to your business.",
+				"Secure blockchain storage with real-time credential updates, trusted by major platforms.",
 		},
 		{
 			Icon: Users,
-			title: "Improved User Experience",
+			title: "Seamless User Experience",
 			description:
-				"Provide visitors with seamless navigation and intuitive interfaces, ensuring a positive experience every time.",
+				"Instant service access with no repetitive submissions, resulting in 68% faster onboarding.",
 		},
 		{
 			Icon: TrendingUp,
 			title: "Higher Conversion Rates",
 			description:
-				"Convert more visitors into customers with strategically designed elements and compelling calls-to-action tailored to drive desired actions.",
+				"Reduce abandonment rates by 81% with a trusted verification system and enterprise-grade security.",
 		},
 		{
 			Icon: LayoutGrid,
-			title: "Greater Accessibility",
+			title: "Secure Accessibility",
 			description:
-				"Reach a wider audience and cater to diverse user needs with responsive design and accessibility features, enhancing inclusivity and user satisfaction.",
+				"User-controlled data sharing, bank-grade encryption, and decentralized storage for enhanced security.",
 		},
 		{
 			Icon: Scale,
-			title: "Scalability and Flexibility",
+			title: "Smart KYC Protection",
 			description:
-				"Adapt to evolving business needs and growth opportunities effortlessly with scalable solutions and flexible architecture tailored to your requirements.",
+				"$500M cost reduction for banks and a 43% increase in user trust, compliant with regulations.",
 		},
 	];
 
